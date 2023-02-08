@@ -1,0 +1,12 @@
+{
+    "templates": {
+        "folder": "templates",
+        "geom_line": "geom_line.setting",
+        "scale": "scale.setting",
+        "point_data": "point_data.setting",
+        "point_id": "point_id.setting"
+    },
+    "data": {
+        "folder": "data"
+    }
+}
