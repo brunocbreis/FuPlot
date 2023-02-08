@@ -5,7 +5,7 @@
 				TopLeftRed = Input { Value = {{ RED }} },
 				TopLeftGreen = Input { Value = {{ GREEN }} },
 				TopLeftBlue = Input { Value = {{ BLUE }} },
-				TopLeftAlpha = Input { Value = 1 },
+				TopLeftAlpha = Input { Value = {{ ALPHA }} },
 
 				EffectMask = Input {
 					SourceOp = "Plot",
