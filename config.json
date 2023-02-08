@@ -7,6 +7,6 @@
         "point_id": "point_id.setting"
     },
     "data": {
-        "folder": "data"
+        "folder": "test_data"
     }
 }
