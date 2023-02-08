@@ -1,2 +1,0 @@
-                {{ POINT_NAME }} = Input { Value = { {{ X }}, {{ Y }} }, },
- 
