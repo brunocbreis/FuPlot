@@ -55,6 +55,9 @@ class FuPlot:
         ...
         return s
 
+    def geom_line(self, x: str, y: str, thickness: float = 0.003, color: RGBA = RGBA()):
+        self.geoms.append(GeomLine(self.data[x], self.data[y], thickness, color))
+
 
 def main():
     data = {"nums": [1, 2, 3], "letters": ["a", "b", "c"]}

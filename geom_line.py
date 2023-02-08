@@ -3,21 +3,37 @@ from datetime import datetime
 from jinja2 import Template
 import pyperclip
 from pathlib import Path
-
-# Files
-TEMPLATES_FOLDER = Path("templates")
-DATA_FOLDER = Path("data")
-GEOM_LINE_TEMPLATE_FILE = TEMPLATES_FOLDER / "geom_line_template.setting"
+import json
+from types import SimpleNamespace
 
 
-# Templates
-POINT_ID_TEMPLATE = Template('\t\t\t\t\t\t\t{ PublishID = "{{ POINT_NAME }}" },\n ')
-POINT_DATA_TEMPLATE = Template(
-    "\t\t\t\t{{ POINT_NAME }} = Input { Value = { {{ X }}, {{ Y }} }, },\n "
-)
+# LOAD CONFIG
+with open("config.json", "r") as _:
+    CONFIG = json.load(_, object_hook=lambda item: SimpleNamespace(**item))
 
-with open(GEOM_LINE_TEMPLATE_FILE, "r") as t:
-    LINEGRAPH_TEMPLATE = Template(t.read())
+# LOAD DATA
+DATA_FOLDER = Path(CONFIG.data.folder)
+
+
+# LOAD TEMPLATES
+# Helper func
+def template_from_file(file: Path) -> Template:
+    with open(file, "r") as _:
+        template = Template(_.read())
+    return template
+
+
+TEMPS = CONFIG.templates
+TEMPS_FOLDER = Path(TEMPS.folder)
+
+GEOM_LINE_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.geom_line
+POINT_ID_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.point_id
+POINT_DATA_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.point_data
+
+
+GEOM_LINE_TEMPLATE = template_from_file(GEOM_LINE_TEMPLATE_FILE)
+POINT_ID_TEMPLATE = template_from_file(POINT_ID_TEMPLATE_FILE)
+POINT_DATA_TEMPLATE = template_from_file(POINT_DATA_TEMPLATE_FILE)
 
 
 # Template rendering funcs
@@ -69,12 +85,9 @@ def line_graph(
     x = [x for x, _ in x_y_sorted]
     y = [y for _, y in x_y_sorted]
 
-    point_ids_string = render_point_ids(len(x))
-    point_data_str = render_point_data(x, y)
-
-    return LINEGRAPH_TEMPLATE.render(
-        POINTS_ID=point_ids_string,
-        POINTS_DATA=point_data_str,
+    return GEOM_LINE_TEMPLATE.render(
+        POINTS_ID=render_point_ids(len(x)),
+        POINTS_DATA=render_point_data(x, y),
         RED=color[0],
         BLUE=color[1],
         GREEN=color[2],
@@ -86,7 +99,7 @@ def main():
     WIDTH = 0.8
     HEIGHT = 0.8
 
-    COLOR = (0.2, 0.3, 1)
+    COLOR = (0.5, 0.3, 1)
 
     # Data import and cleanup
     DATA_FILE = DATA_FOLDER / "IVV.csv"
