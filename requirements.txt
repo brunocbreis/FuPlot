@@ -1,0 +1,3 @@
+jinja2 # For simpler templating.
+pyperclip # Right now, for use outside of Fusion.
+pandas # To better deal with csv and potentially excel files.
