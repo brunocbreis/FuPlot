@@ -1,0 +1,45 @@
+		ScaleXLine = sRectangle {
+			Inputs = {
+                Width = Input { Value = {{ SCALE_X_LENGTH }}, },
+                Height = Input { Value = {{ SCALE_LINE_THICKNESS }}, },
+                Red = Input { Value = {{ SCALE_LINE_RED }}, },
+                Green = Input { Value = {{ SCALE_LINE_GREEN }}, },
+                Blue = Input { Value = {{ SCALE_LINE_BLUE }}, },
+			},
+			ViewInfo = OperatorInfo { Pos = { 110, -66 } },
+		},
+        ScaleYLine = sRectangle {
+			Inputs = {
+                Width = Input { Value = {{ SCALE_LINE_THICKNESS }} },
+                Height = Input { Value = {{ SCALE_Y_LENGTH }} },
+                Red = Input { Value = {{ SCALE_LINE_RED }}, },
+                Green = Input { Value = {{ SCALE_LINE_GREEN }}, },
+                Blue = Input { Value = {{ SCALE_LINE_BLUE }}, },
+			},
+			ViewInfo = OperatorInfo { Pos = { 110, -99 } },
+		},
+        ScaleMerge = sMerge {
+            Inputs = {
+                Input1 = Input {
+                    SourceOp = "ScaleXLine",
+                    Source = "Output",
+                },
+                Input2 = Input {
+                    SourceOp = "ScaleYLine",
+                    Source = "Output",
+                },
+            },
+            ViewInfo = OperatorInfo { Pos = { 220, -66 } },
+        },
+        ScaleRender = sRender {
+            Inputs = {
+                Input = Input {
+                    SourceOp = "ScaleMerge",
+                    Source = "Output",
+                },
+                UseFrameFormatSettings = Input { Value = 1, },
+            },
+            ViewInfo = OperatorInfo { Pos = { 220, -33 } },
+        },
+
+
