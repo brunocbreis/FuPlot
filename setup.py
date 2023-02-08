@@ -7,7 +7,7 @@ setuptools.setup(
     url="https://github.com/brunocbreis/FuPlot",
     author="Bruno Reis",
     install_requires=[
-        "git+https://github.com/brunocbreis/pysion#egg=pysion",
+        "pysion @ git+https://github.com/brunocbreis/pysion#egg=pysion",
         "pandas",
         "pyperclip",
     ],
