@@ -6,4 +6,6 @@ build/
 dist/
 **/__pycache__/
 /fuplot.egg-info/
-/bin/
+bin/
+.venv/
+use_test.py
