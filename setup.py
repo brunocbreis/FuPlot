@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="FuPlot",
+    name="fuplot",
     version="0.1",
     description="Framework for creating animatable data visualizations from tabular data for DaVinci Resolve Fusion.",
     url="https://github.com/brunocbreis/FuPlot",
