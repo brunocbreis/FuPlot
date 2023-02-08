@@ -3,54 +3,8 @@ from typing import Protocol
 from dataclasses import dataclass, field
 import pandas as pd
 from pathlib import Path
-from jinja2 import Template
-import json
 import pyperclip
-
-# CONFIG ==================================================
-with open("config.json", "r") as _:
-    config = json.load(_, object_hook=lambda item: SimpleNamespace(**item))
-
-
-# TEMPLATES ==================================================
-def template_from_file(file: Path) -> Template:
-    with open(file, "r") as _:
-        template = Template(_.read())
-    return template
-
-
-TEMPS = config.templates
-TEMPS_FOLDER = Path(TEMPS.folder)
-
-GEOM_LINE_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.geom_line
-POINT_ID_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.point_id
-POINT_DATA_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.point_data
-
-
-GEOM_LINE_TEMPLATE = template_from_file(GEOM_LINE_TEMPLATE_FILE)
-POINT_ID_TEMPLATE = template_from_file(POINT_ID_TEMPLATE_FILE)
-POINT_DATA_TEMPLATE = template_from_file(POINT_DATA_TEMPLATE_FILE)
-
-
-# Template rendering
-def render_point_ids(no_of_points: int) -> str:
-    point_ids = [f"Point{i}" for i in range(no_of_points)]
-
-    s = ""
-    for p in point_ids:
-        s += POINT_ID_TEMPLATE.render(POINT_NAME=p)
-
-    return s
-
-
-def render_point_data(x: list[int | float], y: list[int | float]) -> str:
-    point_ids = [f"Point{i}" for i in range(len(x))]
-
-    s = ""
-    for x_data, y_data, point_id in zip(x, y, point_ids):
-        s += POINT_DATA_TEMPLATE.render(POINT_NAME=point_id, X=x_data, Y=y_data)
-
-    return s
+from pysion import Tool, wrap_for_fusion
 
 
 # FUSIONIZING ==================================================
@@ -58,6 +12,8 @@ def fusionize(
     values: list[int | float],
     dimensions: float = 1,
 ) -> list[float]:
+    """Normalizes positional values for Fusion canvases"""
+
     min_value = min(values)
     max_value = max(values)
     range = max_value - min_value
@@ -100,24 +56,32 @@ class GeomLine:
     color: RGBA = field(default_factory=RGBA)
 
     def render(self, width: float, height: float) -> str:
-        fusionized_x = fusionize(self.x, width)
-        fusionized_y = fusionize(self.y, height)
+        fu_x = fusionize(self.x, width)
+        fu_y = fusionize(self.y, height)
 
-        x_y_sorted = sorted(zip(fusionized_x, fusionized_y))
-
-        x = [x for x, _ in x_y_sorted]
-        y = [y for _, y in x_y_sorted]
+        points = list(sorted(zip(fu_x, fu_y)))
 
         alpha = self.color.alpha
 
-        return GEOM_LINE_TEMPLATE.render(
-            POINTS_ID=render_point_ids(len(x)),
-            POINTS_DATA=render_point_data(x, y),
-            RED=self.color.red * alpha,
-            GREEN=self.color.green * alpha,
-            BLUE=self.color.blue * alpha,
-            ALPHA=self.color.alpha,
+        line = (
+            Tool("PolylineMask", "Plot", (0, -1))
+            .add_inputs(BorderWidth=self.thickness)
+            .add_published_polyline(points)
         )
+
+        background = (
+            Tool("Background", "PlotColor")
+            .add_inputs(
+                TopLeftRed=self.color.red * alpha,
+                TopLeftGreen=self.color.green * alpha,
+                TopLeftBlue=self.color.blue * alpha,
+                TopLeftAlpha=alpha,
+                UseFrameFormatSettings=1,
+            )
+            .add_mask(line.name)
+        )
+
+        return wrap_for_fusion([background, line])
 
 
 # FUPLOT ==================================================
@@ -156,7 +120,7 @@ class FuPlot:
 
 # MAIN ==================================================
 def main():
-    data = pd.read_csv(Path(config.data.folder) / "IVV.csv")
+    data = pd.read_csv(Path("test_data") / "IVV.csv")
     # clean dates
     data.Date = pd.to_datetime(data.Date).apply(lambda v: v.value)
 
