@@ -5,4 +5,4 @@ test.py
 build/
 dist/
 **/__pycache__/
-/pysion.egg-info/
+/fuplot.egg-info/
