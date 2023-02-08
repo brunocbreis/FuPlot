@@ -1,18 +1,20 @@
-import pandas as pd
-from datetime import datetime
 from jinja2 import Template
+import pandas as pd
 import pyperclip
+
+from datetime import datetime
 from pathlib import Path
-import json
 from types import SimpleNamespace
+
+import json
 
 
 # LOAD CONFIG
 with open("config.json", "r") as _:
-    CONFIG = json.load(_, object_hook=lambda item: SimpleNamespace(**item))
+    config = json.load(_, object_hook=lambda item: SimpleNamespace(**item))
 
 # LOAD DATA
-DATA_FOLDER = Path(CONFIG.data.folder)
+DATA_FOLDER = Path(config.data.folder)
 
 
 # LOAD TEMPLATES
@@ -23,7 +25,7 @@ def template_from_file(file: Path) -> Template:
     return template
 
 
-TEMPS = CONFIG.templates
+TEMPS = config.templates
 TEMPS_FOLDER = Path(TEMPS.folder)
 
 GEOM_LINE_TEMPLATE_FILE = TEMPS_FOLDER / TEMPS.geom_line
@@ -70,7 +72,7 @@ def fusionize(
     return [margin + dimensions / range * (v - min_value) for v in values]
 
 
-def line_graph(
+def line_plot(
     x: list[int | float],
     y: list[int | float],
     width: float = 1,
@@ -95,7 +97,7 @@ def line_graph(
 
 
 def main():
-    # Configs
+    # configs
     WIDTH = 0.8
     HEIGHT = 0.8
 
@@ -115,8 +117,8 @@ def main():
 
     x_timestamp = [datetime.strptime(x, DATE_FORMAT).timestamp() for x in x_raw]
 
-    # Render graph
-    pyperclip.copy(line_graph(x_timestamp, y_raw, WIDTH, HEIGHT, COLOR))
+    # Render plot
+    pyperclip.copy(line_plot(x_timestamp, y_raw, WIDTH, HEIGHT, COLOR))
 
 
 if __name__ == "__main__":
