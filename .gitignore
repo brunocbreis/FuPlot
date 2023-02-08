@@ -6,3 +6,4 @@ build/
 dist/
 **/__pycache__/
 /fuplot.egg-info/
+/bin/
