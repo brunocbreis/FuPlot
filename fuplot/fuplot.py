@@ -1,7 +1,5 @@
 from typing import Protocol
 import pandas as pd
-from pathlib import Path
-import pyperclip
 from .style import RGBA, COLORS
 from .geom_line import GeomLine
 
@@ -41,6 +39,6 @@ class FuPlot:
         return s
 
     def geom_line(
-        self, x: str, y: str, thickness: float = 0.003, color: RGBA = RGBA()
+        self, x: str, y: str, thickness: float = 0.003, color: RGBA = COLORS.black
     ) -> None:
         self.geoms.append(GeomLine(self.data[x], self.data[y], thickness, color))
