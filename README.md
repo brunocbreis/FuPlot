@@ -4,7 +4,7 @@ FuPlot is a ggplot2 inspired framework for creating animatable data visualizatio
 
 ## TODO
 
-- wrap stuff into a group
+- wrap stuff into a group for cleaner node output
 - create scales
 - ability to better configure margin and dimensional properties
 - geom_point for scatter plots
@@ -12,3 +12,4 @@ FuPlot is a ggplot2 inspired framework for creating animatable data visualizatio
 - GUI for use within Fusion in a plugin-like interface
 - turn into pip installable package
 - make it work as a script in fusion rather than generating text
+- figure out how it works in fusion when points are not published
