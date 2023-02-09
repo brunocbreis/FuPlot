@@ -16,3 +16,5 @@ FuPlot is a ggplot2 inspired framework for creating animatable data visualizatio
 - figure out how it works in fusion when points are not published
 - fix ActiveTool not being the merge
 - better separate importing data (should expect clean data) and creating plots workflows
+- text
+- bg > canvas > axes > geoms > text; the final render should construct these and merge them one by one to generate tools in an organized manner
