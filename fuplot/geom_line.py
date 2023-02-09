@@ -14,6 +14,8 @@ class GeomLine:
 
     @property
     def name(self) -> str:
+        """Same name of the tool that outputs the final geom image"""
+
         return f"GeomLine{self.index}"
 
     def render(self, width: float, height: float) -> list[Tool]:
@@ -25,13 +27,13 @@ class GeomLine:
         alpha = self.color.alpha
 
         line = (
-            Tool("PolylineMask", "Plot", (0, -1))
+            Tool("PolylineMask", "PlotLine", (0, -1))
             .add_inputs(BorderWidth=self.thickness)
             .add_published_polyline(points)
         )
 
         background = (
-            Tool("Background", self.name)
+            Tool("Background", "PlotColor")
             .add_inputs(
                 TopLeftRed=self.color.red * alpha,
                 TopLeftGreen=self.color.green * alpha,
@@ -43,7 +45,7 @@ class GeomLine:
         )
 
         geom_line = (
-            Macro("LinePlot", [line, background], (0, -1))
+            Macro(self.name, [line, background], (0, -1))
             .add_instance_output(Output(background.name))
             .add_instance_input(
                 background.inputs["TopLeftRed"], ControlGroup=1, Name="Color"
