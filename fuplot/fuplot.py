@@ -54,12 +54,15 @@ class FuPlot:
         return ""
 
     def render(self) -> str:
-        t = self._render_background()
+        # t = self._render_background()
         # s += self._render_axes()
-
+        t = []
         for geom in self.geoms:
             for tool in geom.render(self.width, self.height):
                 t.append(tool)
+
+        for tool in self._render_background():
+            t.append(tool)
 
         return wrap_for_fusion(t)
 
