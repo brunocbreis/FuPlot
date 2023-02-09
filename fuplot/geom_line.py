@@ -2,6 +2,7 @@ from .fusionize import fusionize
 from dataclasses import dataclass, field
 from .style import RGBA
 from pysion import Tool, Macro, Output, Input
+from pysion.utils import fusion_string
 
 
 @dataclass
@@ -29,6 +30,7 @@ class GeomLine:
         line = (
             Tool("PolylineMask", "PlotLine", (0, -1))
             .add_inputs(BorderWidth=self.thickness)
+            .add_inputs("Expression", Level="WriteLength > 0 and 1 or 0")
             .add_published_polyline(points)
         )
 
