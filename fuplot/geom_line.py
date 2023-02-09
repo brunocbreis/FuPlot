@@ -18,7 +18,7 @@ class GeomLine:
 
         return f"GeomLine{self.index}"
 
-    def render(self, width: float, height: float) -> list[Tool]:
+    def render(self, width: float, height: float, resolution: tuple[int, int]) -> Tool:
         fu_x = fusionize(self.x, width)
         fu_y = fusionize(self.y, height)
 
@@ -39,13 +39,15 @@ class GeomLine:
                 TopLeftGreen=self.color.green * alpha,
                 TopLeftBlue=self.color.blue * alpha,
                 TopLeftAlpha=alpha,
-                UseFrameFormatSettings=1,
+                UseFrameFormatSettings=0,
+                Width=resolution[0],
+                Height=resolution[1],
             )
             .add_mask(line.name)
         )
 
         geom_line = (
-            Macro(self.name, [line, background], (0, -1))
+            Macro(self.name, [line, background], (self.index, -1))
             .add_instance_output(Output(background.name))
             .add_instance_input(
                 background.inputs["TopLeftRed"], ControlGroup=1, Name="Color"
@@ -58,4 +60,4 @@ class GeomLine:
             .add_instance_input(Input(line.name, "WriteLength", 1))
         )
 
-        return [geom_line]
+        return geom_line

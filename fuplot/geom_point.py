@@ -9,7 +9,7 @@ from pysion.utils import fusion_point
 class GeomPoint:
     x: list[int | float]
     y: list[int | float]
-    size: float | list[int | float] = 0.005
+    size: float | list[int | float] = 0.0075
     fill: RGBA = field(default_factory=RGBA)
     index: int = 1
 
@@ -19,7 +19,7 @@ class GeomPoint:
 
         return f"GeomPoint{self.index}"
 
-    def render(self, width: float, height: float) -> list[Tool]:
+    def render(self, width: float, height: float, resolution: tuple[int, int]) -> Tool:
         fu_x = fusionize(self.x, width)
         fu_y = fusionize(self.y, height)
 
@@ -38,18 +38,22 @@ class GeomPoint:
         bg = (
             Tool("Background", "GeomPointFill", (0, len(self.points)))
             .add_inputs(
-                UseFrameFormatSettings=1,
                 TopLeftRed=self.fill.red,
                 TopLeftGreen=self.fill.green,
                 TopLeftBlue=self.fill.blue,
                 TopLeftAlpha=1,
+                UseFrameFormatSettings=0,
+                Width=resolution[0],
+                Height=resolution[1],
             )
             .add_mask(self.points[-1].name)
         )
 
-        macro = Macro(self.name, self.points + [bg])
+        macro = Macro(
+            self.name, self.points + [bg], (self.index, -1)
+        ).add_instance_output(Output(bg.name))
 
-        return [macro]
+        return macro
 
     def __post_init__(self):
         self._points: list[Tool] = []
@@ -64,6 +68,8 @@ class GeomPoint:
             Width=size, Height=size, Center=fusion_point(x, y), Level=self.fill.alpha
         )
         if len(self.points) > 0:
-            ellipse.add_mask(self.points[i - 1].name)
+            ellipse.add_mask(self.points[i - 1].name).add_inputs(
+                PaintMode='FuID { "Add" }'
+            )
 
         self._points.append(ellipse)
