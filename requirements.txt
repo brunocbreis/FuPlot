@@ -1,3 +1,3 @@
 pyperclip # Right now, for use outside of Fusion.
 pandas # To better deal with csv and potentially excel files.
-git+https://github.com/brunocbreis/pysion#egg=pysion
+git+https://github.com/brunocbreis/pysion
