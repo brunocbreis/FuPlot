@@ -1,7 +1,7 @@
 from .fusionize import fusionize
 from dataclasses import dataclass, field
 from .style import RGBA
-from pysion import Tool, wrap_for_fusion
+from pysion import Tool, Macro, Output, Input
 
 
 @dataclass
@@ -10,8 +10,13 @@ class GeomLine:
     y: list[int | float]
     thickness: float = 0.003
     color: RGBA = field(default_factory=RGBA)
+    index: int = 1
 
-    def render(self, width: float, height: float) -> str:
+    @property
+    def name(self) -> str:
+        return f"GeomLine{self.index}"
+
+    def render(self, width: float, height: float) -> list[Tool]:
         fu_x = fusionize(self.x, width)
         fu_y = fusionize(self.y, height)
 
@@ -26,7 +31,7 @@ class GeomLine:
         )
 
         background = (
-            Tool("Background", "PlotColor")
+            Tool("Background", self.name)
             .add_inputs(
                 TopLeftRed=self.color.red * alpha,
                 TopLeftGreen=self.color.green * alpha,
@@ -37,4 +42,18 @@ class GeomLine:
             .add_mask(line.name)
         )
 
-        return wrap_for_fusion([background, line])
+        geom_line = (
+            Macro("LinePlot", [line, background], (0, -1))
+            .add_instance_output(Output(background.name))
+            .add_instance_input(
+                background.inputs["TopLeftRed"], ControlGroup=1, Name="Color"
+            )
+            .add_instance_input(background.inputs["TopLeftGreen"], ControlGroup=1)
+            .add_instance_input(background.inputs["TopLeftBlue"], ControlGroup=1)
+            .add_instance_input(background.inputs["TopLeftAlpha"], ControlGroup=1)
+            .add_instance_input(line.inputs["BorderWidth"], Name="Thickness")
+            .add_instance_input(Input(line.name, "WritePosition", 0))
+            .add_instance_input(Input(line.name, "WriteLength", 1))
+        )
+
+        return [geom_line]
