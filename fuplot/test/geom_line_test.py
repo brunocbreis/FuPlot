@@ -1,7 +1,6 @@
 from pathlib import Path
 import pandas as pd
-from fuplot.style import RGBA
-from fuplot import FuPlot, aes
+from fuplot import FuPlot, aes, RGBA
 
 
 # MAIN ==================================================
