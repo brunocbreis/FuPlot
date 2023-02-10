@@ -9,8 +9,8 @@ class GeomLine:
         self,
         data: DataFrame,
         mapping: dict[str, str],
-        thickness: float = None,
-        color: RGBA = None,
+        thickness: float | None = None,
+        color: RGBA | None = None,
         index: int = 1,
     ) -> None:
         self.data = data
@@ -35,7 +35,7 @@ class GeomLine:
         height: float,
         mapping_scales: dict[str, tuple[int, int]],
         resolution: tuple[int, int],
-    ) -> Tool:
+    ) -> Macro | Tool:
         fu_x = fusionize(
             self.data[self.mapping["x"]],
             mapping_scales["x"],

@@ -1,8 +1,8 @@
-from pandas import DataFrame
+from pandas import Series
 
 
 def fusionize(
-    values: list[int | float] | DataFrame,
+    values: list[int | float] | Series,
     scale_data: tuple[int | float, int | float] = None,
     scale_plot: tuple[float, float] = (0, 1),
 ) -> list[float]:
