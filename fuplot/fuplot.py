@@ -97,7 +97,8 @@ class FuPlot:
         return g
 
     def _auto_scale_mappings(self, mapping: dict[str, str]) -> None:
-        self.mapping_scales
+        """Calculates max an min values for each variable that has been
+        associated with a mapping."""
 
         # First time it's run.
         if self.mapping_scales is None:
