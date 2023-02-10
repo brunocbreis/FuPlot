@@ -73,3 +73,20 @@ class GeomPoint:
             )
 
         self._points.append(ellipse)
+
+    @staticmethod
+    def fusionize_size(
+        values: list[int | float], max_size: float, min_size: float, scale: float
+    ) -> list[float]:
+        """Normalizes size values for Fusion, considering the plot's scale and a min and max sizes"""
+
+        min_value = min(values)
+        max_value = max(values)
+        origin_range = max_value - min_value
+        dest_range = max_size - min_size
+        # margin = (1 - scale) / 2
+
+        return [
+            min_size + (scale / origin_range) / dest_range * (v - min_value)
+            for v in values
+        ]
