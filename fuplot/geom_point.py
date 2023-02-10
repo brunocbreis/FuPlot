@@ -31,14 +31,29 @@ class GeomPoint:
 
         return f"GeomPoint{self.index}"
 
-    def render(self, width: float, height: float, resolution: tuple[int, int]) -> Tool:
-        fu_x = fusionize(self.data[self.mapping["x"]], scale_plot=dim_to_scale(width))
-        fu_y = fusionize(self.data[self.mapping["y"]], scale_plot=dim_to_scale(height))
+    def render(
+        self,
+        width: float,
+        height: float,
+        mapping_scales: dict[str, tuple[int, int]],
+        resolution: tuple[int, int],
+    ) -> Tool:
+        fu_x = fusionize(
+            self.data[self.mapping["x"]],
+            mapping_scales["x"],
+            dim_to_scale(width),
+        )
+        fu_y = fusionize(
+            self.data[self.mapping["y"]],
+            mapping_scales["y"],
+            dim_to_scale(height),
+        )
 
         if "size" in self.mapping:
             fu_size = fusionize(
                 self.data[self.mapping["size"]],
-                scale_plot=dim_to_scale(width / 4, 0.25),
+                mapping_scales["size"],
+                dim_to_scale(width / 4, 0.25),
             )
         else:
             fu_size = [self.size for _ in fu_x]
