@@ -3,9 +3,10 @@ import pandas as pd
 from .style import COLORS
 from .geom_line import GeomLine
 from .geom_point import GeomPoint
-from pysion import Tool, wrap_for_fusion, Macro, Output
+from pysion import Tool, wrap_for_fusion, Macro
 from pysion.utils import fusion_point, RGBA
 from dataclasses import dataclass
+import pyperclip
 
 
 # GEOMS ========================================
@@ -111,7 +112,12 @@ class FuPlot:
                 continue
             merges.append(Tool.merge(f"Merge{i}", merges[i - 2], tool, (i - 1, 0)))
 
-        return wrap_for_fusion(t + merges)
+        s = wrap_for_fusion(t + merges)
+        pyperclip.copy(s)
+
+        print("Rendered node tree successfully copied to the clipboard.")
+
+        return s
 
     def geom_line(
         self, x: str, y: str, thickness: float = 0.003, color: RGBA = COLORS.black

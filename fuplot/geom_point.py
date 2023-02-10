@@ -33,7 +33,10 @@ class GeomPoint:
             self._add_point(p[0], p[1], s)
 
         bg = Tool.bg(
-            "GeomPointFill", self.fill, resolution, (0, len(self.points))
+            "GeomPointFill",
+            RGBA(self.fill.red, self.fill.green, self.fill.blue),
+            resolution,
+            (0, len(self.points)),
         ).add_mask(self.points[-1].name)
 
         macro = Macro(self.name, self.points + [bg], (self.index, -1))
