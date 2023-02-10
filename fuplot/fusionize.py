@@ -1,5 +1,8 @@
+from pandas import DataFrame
+
+
 def fusionize(
-    values: list[int | float],
+    values: list[int | float] | DataFrame,
     dimensions: float = 1,
 ) -> list[float]:
     """Normalizes positional values for Fusion canvases"""

@@ -119,11 +119,36 @@ class FuPlot:
 
         return s
 
+    def pass_to_geom(
+        self, data: pd.DataFrame, mapping: dict[str, str]
+    ) -> tuple[pd.DataFrame, dict[str, str]]:
+        """Generalizes the passing of data and mapping to any geom."""
+
+        if data is None:
+            data = self.data
+        if mapping is None:
+            new_mapping = self.mapping
+        else:
+            new_mapping = {k: v for k, v in self.mapping.items()}
+            for k, v in mapping.items():
+                if v is None:
+                    continue
+                new_mapping[k] = v
+
+        print(new_mapping)
+        return data, new_mapping
+
     def geom_line(
-        self, x: str, y: str, thickness: float = 0.003, color: RGBA = COLORS.black
-    ) -> None:
-        idx = len(self.geoms) + 1
-        self.geoms.append(GeomLine(self.data[x], self.data[y], thickness, color, idx))
+        self,
+        data: pd.DataFrame = None,
+        mapping: dict[str, str] = None,
+        thickness: float = None,
+        color: RGBA = None,
+    ):
+        data, mapping = self.pass_to_geom(data, mapping)
+
+        index = len(self.geoms) + 1
+        self.geoms.append(GeomLine(data, mapping, thickness, color, index))
 
         return self
 
