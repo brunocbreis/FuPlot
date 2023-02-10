@@ -9,4 +9,4 @@ def fusionize(
     range = max_value - min_value
     margin = (1 - dimensions) / 2
 
-    return [margin + dimensions / range * (v - min_value) for v in values]
+    return [margin + (dimensions / range) * (v - min_value) for v in values]
