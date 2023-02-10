@@ -18,3 +18,5 @@ FuPlot is a ggplot2 inspired framework for creating animatable data visualizatio
 - better separate importing data (should expect clean data) and creating plots workflows
 - text
 - bg > canvas > axes > geoms > text; the final render should construct these and merge them one by one to generate tools in an organized manner
+- create canvas for graph so scale can make it go outside the displayed area (use a mask)
+- test exporting some values as dynamically controllable in fusion for easier animation
