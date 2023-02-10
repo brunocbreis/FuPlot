@@ -1,16 +1,29 @@
-from .fusionize import fusionize
-from dataclasses import dataclass, field
+from .fusionize import fusionize, dim_to_scale
 from pysion import Tool, Macro
 from pysion.utils import fusion_point, RGBA, fu_id
+from pandas import DataFrame
 
 
-@dataclass
 class GeomPoint:
-    x: list[int | float]
-    y: list[int | float]
-    size: float | list[int | float] = 0.0075
-    fill: RGBA = field(default_factory=RGBA)
-    index: int = 1
+    def __init__(
+        self,
+        data: DataFrame,
+        mapping: dict[str, str],
+        size: float = None,
+        fill: RGBA = None,
+        index: int = 1,
+    ) -> None:
+        self.data = data
+        self.mapping = mapping
+
+        # style
+        self.size = size if size else 0.0075
+        self.fill = fill if fill else RGBA()
+
+        # index
+        self.index = index
+
+        self._points: list[Tool] = []
 
     @property
     def name(self) -> str:
@@ -19,13 +32,16 @@ class GeomPoint:
         return f"GeomPoint{self.index}"
 
     def render(self, width: float, height: float, resolution: tuple[int, int]) -> Tool:
-        fu_x = fusionize(self.x, width)
-        fu_y = fusionize(self.y, height)
+        fu_x = fusionize(self.data[self.mapping["x"]], scale_plot=dim_to_scale(width))
+        fu_y = fusionize(self.data[self.mapping["y"]], scale_plot=dim_to_scale(height))
 
-        if type(self.size) is float:
-            fu_size = [self.size for _ in fu_x]
+        if "size" in self.mapping:
+            fu_size = fusionize(
+                self.data[self.mapping["size"]],
+                scale_plot=dim_to_scale(width / 4, 0.25),
+            )
         else:
-            fu_size = self.fusionize_size(self.size, 0.1, 0.001, width)
+            fu_size = [self.size for _ in fu_x]
 
         points = list(sorted(zip(fu_x, fu_y)))
 
@@ -42,9 +58,6 @@ class GeomPoint:
         macro = Macro(self.name, self.points + [bg], (self.index, -1))
 
         return macro
-
-    def __post_init__(self):
-        self._points: list[Tool] = []
 
     @property
     def points(self) -> list[Tool]:

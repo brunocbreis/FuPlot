@@ -1,6 +1,6 @@
 from pathlib import Path
 import pandas as pd
-from fuplot import FuPlot, RGBA
+from fuplot import FuPlot, RGBA, aes
 
 
 def main() -> None:
@@ -16,9 +16,7 @@ def main() -> None:
 
     plot = FuPlot(data, width=0.6)
     plot.geom_point(
-        x="distance",
-        y="orbital_period",
-        size="mass",
+        mapping=aes("distance", "orbital_period", size="mass"),
         fill=RGBA(0.2, 1, 0.4, 0.25, premultiply=False),
     )
     plot.render()
