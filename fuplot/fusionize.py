@@ -23,8 +23,10 @@ def fusionize(
     return [range_plot * (v - min_data) / range_data + min_plot for v in values]
 
 
-def dim_to_scale(dim: float) -> tuple[float, float]:
-    return (1 - dim) / 2, 1 - (1 - dim / 2)
+def dim_to_scale(dim: float, center: float = 0.5) -> tuple[float, float]:
+    max_value = center + dim / 2
+    min_value = max_value - dim
+    return min_value, max_value
 
 
 def scale_to_dim(scale: tuple[float, float]) -> float:

@@ -1,13 +1,13 @@
-from .fusionize import fusionize
+from .fusionize import fusionize, dim_to_scale
 from pysion.utils import RGBA
 from pysion import Tool, Macro, Input
-import pandas as pd
+from pandas import DataFrame
 
 
 class GeomLine:
     def __init__(
         self,
-        data: pd.DataFrame,
+        data: DataFrame,
         mapping: dict[str, str],
         thickness: float = None,
         color: RGBA = None,
@@ -22,7 +22,6 @@ class GeomLine:
 
         # index
         self.index = index
-        pass
 
     @property
     def name(self) -> str:
@@ -31,8 +30,8 @@ class GeomLine:
         return f"GeomLine{self.index}"
 
     def render(self, width: float, height: float, resolution: tuple[int, int]) -> Tool:
-        fu_x = fusionize(self.data[self.mapping["x"]], width)
-        fu_y = fusionize(self.data[self.mapping["y"]], height)
+        fu_x = fusionize(self.data[self.mapping["x"]], scale_plot=dim_to_scale(width))
+        fu_y = fusionize(self.data[self.mapping["y"]], scale_plot=dim_to_scale(height))
 
         points = list(sorted(zip(fu_x, fu_y)))
 

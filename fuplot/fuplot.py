@@ -128,6 +128,8 @@ class FuPlot:
             data = self.data
         if mapping is None:
             new_mapping = self.mapping
+        if self.mapping is None:
+            new_mapping = mapping
         else:
             new_mapping = {k: v for k, v in self.mapping.items()}
             for k, v in mapping.items():
@@ -152,13 +154,17 @@ class FuPlot:
 
         return self
 
-    def geom_point(self, x: str, y: str, size: str, fill: RGBA = COLORS.black) -> None:
-        idx = len(self.geoms) + 1
-        self.geoms.append(
-            GeomPoint(
-                self.data[x], self.data[y], size=self.data[size], fill=fill, index=idx
-            )
-        )
+    def geom_point(
+        self,
+        data: pd.DataFrame = None,
+        mapping: dict[str, str] = None,
+        size: float = None,
+        fill: RGBA = None,
+    ):
+        data, mapping = self.pass_to_geom(data, mapping)
+
+        index = len(self.geoms) + 1
+        self.geoms.append(GeomPoint(data, mapping, size, fill, index))
 
         return self
 
