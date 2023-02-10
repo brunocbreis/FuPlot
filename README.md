@@ -1,6 +1,6 @@
 # FuPlot
 
-FuPlot is a ggplot2 inspired framework for creating animatable data visualizations from tabular data for DaVinci Resolve Fusion.
+FuPlot is a ggplot2 (heavily) inspired framework for creating animatable data visualizations from tabular data for DaVinci Resolve Fusion.
 
 ## TODO
 
@@ -17,3 +17,5 @@ FuPlot is a ggplot2 inspired framework for creating animatable data visualizatio
 - text for titles and stuff
 - create canvas for graph so scale can make it go outside the displayed area (use a mask)
 - test exporting some values as dynamically controllable in fusion for easier animation
+  - add expressions to inputs that connect them to animatable sliders
+  - or add modifiers to each input... don't know which is heavier on the cpu
