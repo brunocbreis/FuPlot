@@ -26,9 +26,7 @@ class GeomPoint:
         if type(self.size) is float:
             fu_size = [self.size for _ in fu_x]
         else:
-            fu_size = fusionize(
-                self.size, 0.3
-            )  # Problem cause min is going to be 0? idk
+            fu_size = self.fusionize_size(self.size, 0.1, 0.001, width)
 
         points = list(sorted(zip(fu_x, fu_y)))
 
@@ -87,6 +85,6 @@ class GeomPoint:
         # margin = (1 - scale) / 2
 
         return [
-            min_size + (scale / origin_range) / dest_range * (v - min_value)
+            min_size + (scale / origin_range) * dest_range * (v - min_value)
             for v in values
         ]

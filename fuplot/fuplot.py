@@ -149,9 +149,13 @@ class FuPlot:
 
         return self
 
-    def geom_point(self, x: str, y: str, fill: RGBA = COLORS.black) -> None:
+    def geom_point(self, x: str, y: str, size: str, fill: RGBA = COLORS.black) -> None:
         idx = len(self.geoms) + 1
-        self.geoms.append(GeomPoint(self.data[x], self.data[y], fill=fill, index=idx))
+        self.geoms.append(
+            GeomPoint(
+                self.data[x], self.data[y], size=self.data[size], fill=fill, index=idx
+            )
+        )
 
         return self
 
