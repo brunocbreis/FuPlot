@@ -29,9 +29,23 @@ class GeomLine:
 
         return f"GeomLine{self.index}"
 
-    def render(self, width: float, height: float, resolution: tuple[int, int]) -> Tool:
-        fu_x = fusionize(self.data[self.mapping["x"]], scale_plot=dim_to_scale(width))
-        fu_y = fusionize(self.data[self.mapping["y"]], scale_plot=dim_to_scale(height))
+    def render(
+        self,
+        width: float,
+        height: float,
+        mapping_scales: dict[str, tuple[int, int]],
+        resolution: tuple[int, int],
+    ) -> Tool:
+        fu_x = fusionize(
+            self.data[self.mapping["x"]],
+            mapping_scales["x"],
+            dim_to_scale(width),
+        )
+        fu_y = fusionize(
+            self.data[self.mapping["y"]],
+            mapping_scales["y"],
+            dim_to_scale(height),
+        )
 
         points = list(sorted(zip(fu_x, fu_y)))
 

@@ -42,6 +42,9 @@ class FuPlot:
 
         self._set_defaults()
 
+        self.mapping_scales: dict[str, tuple[float, float]] = None
+        self._auto_scale_mappings(self.mapping)
+
     def _set_defaults(self):
         self.background_color = COLORS.white
         self.padding = 0.05
@@ -85,9 +88,50 @@ class FuPlot:
     def _render_geoms(self) -> list[Tool]:
         g: list[Tool] = []
         for geom in self.geoms:
-            g.append(geom.render(self.width, self.height, self.resolution))
+            g.append(
+                geom.render(
+                    self.width, self.height, self.mapping_scales, self.resolution
+                )
+            )
 
         return g
+
+    def _auto_scale_mappings(self, mapping: dict[str, str]) -> None:
+        self.mapping_scales
+
+        # First time it's run.
+        if self.mapping_scales is None:
+            self.mapping_scales = {}
+
+            if mapping:
+                for viz, var in mapping.items():
+                    if var is None:
+                        continue
+
+                    min_v = min(self.data[var])
+                    max_v = max(self.data[var])
+                    self.mapping_scales[viz] = (min_v, max_v)
+            return
+
+        if not mapping:
+            return
+
+        # Every time a geom is added.
+        for viz, var in mapping.items():
+            if var is None:
+                continue
+
+            if viz in self.mapping_scales:
+                min_v = min(min(self.data[var]), *self.mapping_scales[viz])
+                max_v = max(max(self.data[var]), *self.mapping_scales[viz])
+                self.mapping_scales[viz] = (min_v, max_v)
+            else:
+                min_v = min(self.data[var])
+                max_v = max(self.data[var])
+                self.mapping_scales[viz] = (min_v, max_v)
+
+    def scale_manual(self, mapping: str, scale: tuple[float, float]):
+        pass
 
     @property
     def aspect_ratio(self) -> float:
@@ -124,18 +168,28 @@ class FuPlot:
     ) -> tuple[pd.DataFrame, dict[str, str]]:
         """Generalizes the passing of data and mapping to any geom."""
 
+        self._auto_scale_mappings(mapping)
+
         if data is None:
             data = self.data
+
         if mapping is None:
             new_mapping = self.mapping
+
+            print(new_mapping)
+            return data, new_mapping
+
         if self.mapping is None:
             new_mapping = mapping
-        else:
-            new_mapping = {k: v for k, v in self.mapping.items()}
-            for k, v in mapping.items():
-                if v is None:
-                    continue
-                new_mapping[k] = v
+
+            print(new_mapping)
+            return data, new_mapping
+
+        new_mapping = {k: v for k, v in self.mapping.items()}
+        for k, v in mapping.items():
+            if v is None:
+                continue
+            new_mapping[k] = v
 
         print(new_mapping)
         return data, new_mapping
