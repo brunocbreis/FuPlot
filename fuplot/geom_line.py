@@ -1,6 +1,6 @@
 from .fusionize import fusionize
 from dataclasses import dataclass, field
-from .style import RGBA
+from pysion.utils import RGBA
 from pysion import Tool, Macro, Output, Input
 
 

@@ -1,15 +1,13 @@
 from .fusionize import fusionize
 from dataclasses import dataclass, field
-from .style import RGBA
+from pysion.utils import RGBA
 from pysion import Tool, Macro, Output, Input
 from typing import Any
 
 
 @dataclass
 class GeomCol:
-    x: list[Any]  # categorical
-    y: list[int | float]
-    fill: list[RGBA] = None
+    mapping: dict[str, str]
 
     @property
     def name(self) -> str:

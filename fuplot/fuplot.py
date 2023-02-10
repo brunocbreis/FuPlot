@@ -1,15 +1,19 @@
 from typing import Protocol
 import pandas as pd
-from .style import RGBA, COLORS
+from .style import COLORS
 from .geom_line import GeomLine
 from .geom_point import GeomPoint
 from pysion import Tool, wrap_for_fusion, Macro, Output
-from pysion.utils import fusion_point
+from pysion.utils import fusion_point, RGBA
 from dataclasses import dataclass
 
 
 # GEOMS ========================================
 class Geom(Protocol):
+    @property
+    def mapping(self) -> dict[str, str]:
+        pass
+
     @property
     def name(self) -> str:
         pass
@@ -18,10 +22,15 @@ class Geom(Protocol):
         pass
 
 
+def aes(x: str = None, y: str = None, **kwargs: dict[str | str]) -> dict[str, str]:
+    return dict(x=x, y=y, **kwargs)
+
+
 # FUPLOT ==================================================
 @dataclass
 class FuPlot:
     data: pd.DataFrame
+    mapping: dict[str, str] = None
     width: float = 0.75
     height: float = 0.75
     resolution: tuple[int, int] = (1920, 1080)
@@ -39,19 +48,7 @@ class FuPlot:
         self.axis_color = RGBA(0.6, 0.6, 0.6, 1)
 
     def _render_background(self) -> Tool:
-        alpha = self.background_color.alpha
-
-        bg = Tool("Background", "PlotBG", (-1, 0)).add_inputs(
-            UseFrameFormatSettings=0,
-            Width=self.resolution[0],
-            Height=self.resolution[1],
-            TopLeftRed=self.background_color.red * alpha,
-            TopLeftGreen=self.background_color.green * alpha,
-            TopLeftBlue=self.background_color.blue * alpha,
-            TopLeftAlpha=alpha,
-        )
-
-        return bg
+        return Tool.bg("PlotBG", self.background_color, self.resolution, (-1, 0))
 
     def _render_axes(self) -> Tool:
         ar = self.aspect_ratio
@@ -107,18 +104,6 @@ class FuPlot:
     @property
     def aspect_ratio(self) -> float:
         return self.resolution[0] / self.resolution[1]
-
-    # def render(self) -> str:
-    #     t: list[Tool] = []
-
-    #     t += self._render_geoms()
-
-    #     t.append(self._render_axes())
-
-    #     for tool in self._render_background():
-    #         t.append(tool)
-
-    #     return wrap_for_fusion(t)
 
     def render(self) -> str:
         t: list[Tool] = []
