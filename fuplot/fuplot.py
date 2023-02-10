@@ -34,7 +34,7 @@ class FuPlot:
 
     def _set_defaults(self):
         self.background_color = COLORS.white
-        self.padding = 0.1
+        self.padding = 0.05
         self.axis_thickness = 0.001
         self.axis_color = RGBA(0.6, 0.6, 0.6, 1)
 
@@ -60,8 +60,8 @@ class FuPlot:
         height = self.height + pd * ar
         width = self.width + pd
 
-        x_pos = 0.5 - 0.5 * (self.width + pd * 0.75)
-        y_pos = 0.5 - 0.5 * (self.height + pd * 0.75 * ar)
+        x_pos = 0.5 - 0.5 * (self.width + pd)
+        y_pos = 0.5 - 0.5 * (self.height + pd * ar)
 
         x_axis = Tool("RectangleMask", "XAxis").add_inputs(
             Height=self.axis_thickness * ar,
