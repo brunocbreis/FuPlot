@@ -60,13 +60,13 @@ class FuPlot:
         x_pos = 0.5 - 0.5 * (self.width + pd)
         y_pos = 0.5 - 0.5 * (self.height + pd * ar)
 
-        x_axis = Tool("RectangleMask", "XAxis").add_inputs(
+        x_axis = Tool.mask("XAxis").add_inputs(
             Height=self.axis_thickness * ar,
             Width=width,
             Center=fusion_point(0.5, y_pos),
         )
         y_axis = (
-            Tool("RectangleMask", "YAxis")
+            Tool.mask("YAxis")
             .add_inputs(
                 Height=height,
                 Width=self.axis_thickness,
@@ -74,25 +74,12 @@ class FuPlot:
             )
             .add_mask(x_axis.name)
         )
-        fill = (
-            Tool("Background", "AxisFill")
-            .add_mask(y_axis.name)
-            .add_inputs(
-                UseFrameFormatSettings=0,
-                Width=self.resolution[0],
-                Height=self.resolution[1],
-                TopLeftRed=self.axis_color.red * self.axis_color.alpha,
-                TopLeftGreen=self.axis_color.green * self.axis_color.alpha,
-                TopLeftBlue=self.axis_color.blue * self.axis_color.alpha,
-                TopLeftAlpha=self.axis_color.alpha,
-            )
+
+        fill = Tool.bg("AxisFill", self.axis_color, self.resolution).add_mask(
+            y_axis.name
         )
 
-        macro = Macro("Axes", [x_axis, y_axis, fill], (0, -1)).add_instance_output(
-            Output(fill.name)
-        )
-
-        return macro
+        return Macro("Axes", [x_axis, y_axis, fill], (0, -1))
 
     def _render_geoms(self) -> list[Tool]:
         g: list[Tool] = []

@@ -1,7 +1,7 @@
 from .fusionize import fusionize
 from dataclasses import dataclass, field
 from pysion.utils import RGBA
-from pysion import Tool, Macro, Output, Input
+from pysion import Tool, Macro, Input
 
 
 @dataclass
@@ -24,38 +24,18 @@ class GeomLine:
 
         points = list(sorted(zip(fu_x, fu_y)))
 
-        alpha = self.color.alpha
-
         line = (
-            Tool("PolylineMask", "PlotLine", (0, -1))
+            Tool.mask("PlotLine", "Polyline", (0, -1))
             .add_inputs(BorderWidth=self.thickness)
             .add_inputs("Expression", Level="WriteLength > 0 and 1 or 0")
             .add_published_polyline(points)
         )
 
-        background = (
-            Tool("Background", "PlotColor")
-            .add_inputs(
-                TopLeftRed=self.color.red * alpha,
-                TopLeftGreen=self.color.green * alpha,
-                TopLeftBlue=self.color.blue * alpha,
-                TopLeftAlpha=alpha,
-                UseFrameFormatSettings=0,
-                Width=resolution[0],
-                Height=resolution[1],
-            )
-            .add_mask(line.name)
-        )
+        background = Tool.bg("PlotColor", self.color, resolution).add_mask(line.name)
 
         geom_line = (
             Macro(self.name, [line, background], (self.index, -1))
-            .add_instance_output(Output(background.name))
-            .add_instance_input(
-                background.inputs["TopLeftRed"], ControlGroup=1, Name="Color"
-            )
-            .add_instance_input(background.inputs["TopLeftGreen"], ControlGroup=1)
-            .add_instance_input(background.inputs["TopLeftBlue"], ControlGroup=1)
-            .add_instance_input(background.inputs["TopLeftAlpha"], ControlGroup=1)
+            .add_color_input(background)
             .add_instance_input(line.inputs["BorderWidth"], Name="Thickness")
             .add_instance_input(Input(line.name, "WritePosition", 0))
             .add_instance_input(Input(line.name, "WriteLength", 1))

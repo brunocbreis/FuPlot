@@ -1,7 +1,7 @@
 from .fusionize import fusionize
 from dataclasses import dataclass, field
-from pysion import Tool, Macro, Output, Input
-from pysion.utils import fusion_point, RGBA
+from pysion import Tool, Macro
+from pysion.utils import fusion_point, RGBA, fu_id
 
 
 @dataclass
@@ -32,23 +32,11 @@ class GeomPoint:
         for p, s in zip(points, fu_size):
             self._add_point(p[0], p[1], s)
 
-        bg = (
-            Tool("Background", "GeomPointFill", (0, len(self.points)))
-            .add_inputs(
-                TopLeftRed=self.fill.red,
-                TopLeftGreen=self.fill.green,
-                TopLeftBlue=self.fill.blue,
-                TopLeftAlpha=1,
-                UseFrameFormatSettings=0,
-                Width=resolution[0],
-                Height=resolution[1],
-            )
-            .add_mask(self.points[-1].name)
-        )
+        bg = Tool.bg(
+            "GeomPointFill", self.fill, resolution, (0, len(self.points))
+        ).add_mask(self.points[-1].name)
 
-        macro = Macro(
-            self.name, self.points + [bg], (self.index, -1)
-        ).add_instance_output(Output(bg.name))
+        macro = Macro(self.name, self.points + [bg], (self.index, -1))
 
         return macro
 
@@ -61,13 +49,11 @@ class GeomPoint:
 
     def _add_point(self, x: float, y: float, size: float):
         i = len(self.points)
-        ellipse = Tool("EllipseMask", f"Point{i+1}", (0, i)).add_inputs(
+        ellipse = Tool.mask(f"Point{i+1}", "Ellipse", (0, i)).add_inputs(
             Width=size, Height=size, Center=fusion_point(x, y), Level=self.fill.alpha
         )
         if len(self.points) > 0:
-            ellipse.add_mask(self.points[i - 1].name).add_inputs(
-                PaintMode='FuID { "Add" }'
-            )
+            ellipse.add_mask(self.points[i - 1].name).add_inputs(PaintMode=fu_id("Add"))
 
         self._points.append(ellipse)
 
@@ -81,7 +67,6 @@ class GeomPoint:
         max_value = max(values)
         origin_range = max_value - min_value
         dest_range = max_size - min_size
-        # margin = (1 - scale) / 2
 
         return [
             min_size + (scale / origin_range) * dest_range * (v - min_value)
