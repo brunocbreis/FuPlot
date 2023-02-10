@@ -11,6 +11,7 @@ class GeomPoint:
         mapping: dict[str, str],
         size: float = None,
         fill: RGBA = None,
+        opacity: float = None,
         index: int = 1,
     ) -> None:
         self.data = data
@@ -19,11 +20,18 @@ class GeomPoint:
         # style
         self.size = size if size else 0.0075
         self.fill = fill if fill else RGBA()
+        self.opacity = opacity if opacity else 1
 
         # index
         self.index = index
 
         self._points: list[Tool] = []
+
+        if self.fill.alpha < 1:
+            print(
+                "Warning: setting fill alpha to less than 1 will darken points' color."
+                'Use "opacity" as an argument instead.'
+            )
 
     @property
     def name(self) -> str:
@@ -81,7 +89,7 @@ class GeomPoint:
     def _add_point(self, x: float, y: float, size: float):
         i = len(self.points)
         ellipse = Tool.mask(f"Point{i+1}", "Ellipse", (0, i)).add_inputs(
-            Width=size, Height=size, Center=fusion_point(x, y), Level=self.fill.alpha
+            Width=size, Height=size, Center=fusion_point(x, y), Level=self.opacity
         )
         if len(self.points) > 0:
             ellipse.add_mask(self.points[i - 1].name).add_inputs(PaintMode=fu_id("Add"))

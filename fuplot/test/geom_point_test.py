@@ -17,7 +17,8 @@ def main() -> None:
     plot = FuPlot(data, width=0.6)
     plot.geom_point(
         mapping=aes("distance", "orbital_period", size="mass"),
-        fill=RGBA(0.2, 1, 0.4, 0.25, premultiply=False),
+        fill=RGBA(0.2, 1, 0.4),
+        opacity=0.25,
     )
     plot.render()
 

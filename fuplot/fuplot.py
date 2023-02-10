@@ -176,13 +176,11 @@ class FuPlot:
         if mapping is None:
             new_mapping = self.mapping
 
-            print(new_mapping)
             return data, new_mapping
 
         if self.mapping is None:
             new_mapping = mapping
 
-            print(new_mapping)
             return data, new_mapping
 
         new_mapping = {k: v for k, v in self.mapping.items()}
@@ -191,7 +189,6 @@ class FuPlot:
                 continue
             new_mapping[k] = v
 
-        print(new_mapping)
         return data, new_mapping
 
     def geom_line(
@@ -210,10 +207,11 @@ class FuPlot:
 
     def geom_point(
         self,
-        data: pd.DataFrame = None,
-        mapping: dict[str, str] = None,
-        size: float = None,
-        fill: RGBA = None,
+        data: pd.DataFrame | None = None,
+        mapping: dict[str, str] | None = None,
+        size: float | None = None,
+        fill: RGBA | None = None,
+        opacity: float | None = None,
     ):
         data, mapping = self.pass_to_geom(data, mapping)
 
