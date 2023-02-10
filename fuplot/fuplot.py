@@ -23,7 +23,7 @@ class Geom(Protocol):
         pass
 
 
-def aes(x: str = None, y: str = None, **kwargs: dict[str | str]) -> dict[str, str]:
+def aes(x: str | None = None, y: str | None = None, **kwargs) -> dict[str, str | None]:
     return dict(x=x, y=y, **kwargs)
 
 
@@ -37,7 +37,6 @@ class FuPlot:
     resolution: tuple[int, int] = (1920, 1080)
 
     def __post_init__(self) -> None:
-        self.data = self.data.to_dict(orient="list")
         self.geoms: list[Geom] = []
 
         self._set_defaults()
