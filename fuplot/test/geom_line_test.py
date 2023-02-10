@@ -11,9 +11,12 @@ def main():
     # clean dates
     data.Date = pd.to_datetime(data.Date).apply(lambda v: v.value)
 
-    plot = FuPlot(data, aes("Date", "High"), width=0.8, height=0.5)
-    plot.geom_line(color=RGBA(0.5, 0.2, 1))
-    plot.geom_line(mapping=aes(y="Low"), color=RGBA(0.2, 0.5, 1))
+    plot = FuPlot(data, aes("Date"), width=0.8, height=0.5)
+    plot.geom_line(mapping=aes(y="High"), color=RGBA(0.2, 1, 0.5))
+    plot.geom_line(mapping=aes(y="Low"), color=RGBA(1, 0.2, 0.5))
+    plot.geom_line(
+        mapping=aes(y="Adj Close"), color=RGBA(0.35, 0.35, 1), thickness=0.0015
+    )
 
     plot.render()
 
