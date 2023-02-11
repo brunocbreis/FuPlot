@@ -19,3 +19,5 @@ FuPlot is a ggplot2 (heavily) inspired framework for creating animatable data vi
 - test exporting some values as dynamically controllable in fusion for easier animation
   - add expressions to inputs that connect them to animatable sliders
   - or add modifiers to each input... don't know which is heavier on the cpu
+- themes
+- color palettes / scales
