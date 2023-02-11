@@ -18,7 +18,7 @@ def main() -> None:
     plot.geom_point(
         mapping=aes("distance", "orbital_period", size="mass"),
         fill=RGBA(0.2, 1, 0.4),
-        opacity=0.25,
+        opacity=0.1,
     )
     plot.render()
 

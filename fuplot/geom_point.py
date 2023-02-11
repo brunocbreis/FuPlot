@@ -9,9 +9,11 @@ class GeomPoint:
         self,
         data: DataFrame,
         mapping: dict[str, str],
-        size: float = None,
         fill: RGBA = None,
         opacity: float = None,
+        size: float = None,
+        max_size: float = None,
+        min_size: float = None,
         index: int = 1,
     ) -> None:
         self.data = data
@@ -21,6 +23,12 @@ class GeomPoint:
         self.size = size if size else 0.0075
         self.fill = fill if fill else RGBA()
         self.opacity = opacity if opacity else 1
+        print("first opacity: ", self.opacity)
+
+        # scaling
+        self.max_size = max_size if max_size else 0.075
+        self.min_size = min_size if min_size else 0.0075
+        print(f"{self.min_size=}, {self.max_size=}")
 
         # index
         self.index = index
@@ -59,9 +67,9 @@ class GeomPoint:
 
         if "size" in self.mapping:
             fu_size = fusionize(
-                self.data[self.mapping["size"]],
-                mapping_scales["size"],
-                dim_to_scale(width / 4, 0.25),
+                values=self.data[self.mapping["size"]],
+                scale_data=mapping_scales["size"],
+                scale_plot=(self.min_size, self.max_size),
             )
         else:
             fu_size = [self.size for _ in fu_x]
@@ -87,6 +95,7 @@ class GeomPoint:
         return self._points
 
     def _add_point(self, x: float, y: float, size: float):
+
         i = len(self.points)
         ellipse = Tool.mask(f"Point{i+1}", "Ellipse", (0, i)).add_inputs(
             Width=size, Height=size, Center=fusion_point(x, y), Level=self.opacity
@@ -95,19 +104,3 @@ class GeomPoint:
             ellipse.add_mask(self.points[i - 1].name).add_inputs(PaintMode=fu_id("Add"))
 
         self._points.append(ellipse)
-
-    @staticmethod
-    def fusionize_size(
-        values: list[int | float], max_size: float, min_size: float, scale: float
-    ) -> list[float]:
-        """Normalizes size values for Fusion, considering the plot's scale and a min and max sizes"""
-
-        min_value = min(values)
-        max_value = max(values)
-        origin_range = max_value - min_value
-        dest_range = max_size - min_size
-
-        return [
-            min_size + (scale / origin_range) * dest_range * (v - min_value)
-            for v in values
-        ]

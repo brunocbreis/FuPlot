@@ -169,6 +169,7 @@ class FuPlot:
         """Generalizes the passing of data and mapping to any geom."""
 
         self._auto_scale_mappings(mapping)
+        # print(self.mapping_scales)
 
         if data is None:
             data = self.data
@@ -209,14 +210,27 @@ class FuPlot:
         self,
         data: pd.DataFrame | None = None,
         mapping: dict[str, str] | None = None,
-        size: float | None = None,
         fill: RGBA | None = None,
         opacity: float | None = None,
+        size: float | None = None,
+        max_size: float = None,
+        min_size: float = None,
     ):
         data, mapping = self.pass_to_geom(data, mapping)
 
         index = len(self.geoms) + 1
-        self.geoms.append(GeomPoint(data, mapping, size, fill, index))
+        self.geoms.append(
+            GeomPoint(
+                data=data,
+                mapping=mapping,
+                fill=fill,
+                opacity=opacity,
+                size=size,
+                max_size=max_size,
+                min_size=min_size,
+                index=index,
+            )
+        )
 
         return self
 
