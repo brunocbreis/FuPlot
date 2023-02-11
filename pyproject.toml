@@ -1,0 +1,8 @@
+name = "fuplot"
+version = "0.1.0"
+description = "A ggplot2 inspired framework for rendering data visualizations for DaVinci Resolve Fusion."
+license = "MIT"
+authors = ["Bruno Reis <brunocbreis@gmail.com>"]
+readme = "README.md"
+repository = "https://github.com/brunocbreis/FuPlot"
+
