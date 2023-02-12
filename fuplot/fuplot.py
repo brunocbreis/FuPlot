@@ -24,12 +24,17 @@ class Geom(Protocol):
 
 
 def aes(x: str | None = None, y: str | None = None, **kwargs) -> dict[str, str | None]:
+    """The aes() function passes data as a dict to FuPlot and geoms' "mapping" argument.
+    The first two arguments are always x and y and are mandatory for any geom."""
+
     return dict(x=x, y=y, **kwargs)
 
 
 # FUPLOT ==================================================
 @dataclass
 class FuPlot:
+    """FuPlot initializer class. This is the base upon which you can add your geoms to map your data into geometry."""
+
     data: pd.DataFrame
     mapping: dict[str, str] = None
     width: float = 0.75
