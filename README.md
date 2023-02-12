@@ -7,7 +7,6 @@ FuPlot is a ggplot2 (heavily) inspired framework for creating animatable data vi
 - wrap stuff into a group for cleaner node output
 - customizable scale
 - ability to better configure margin and dimensional properties
-- geom_col for bar plots
 - GUI for use within Fusion in a plugin-like interface
 - turn into pip installable package
 - make it work as a script in fusion rather than generating text
@@ -24,3 +23,5 @@ FuPlot is a ggplot2 (heavily) inspired framework for creating animatable data vi
 - geom_point:
   - use sNodes instead of masks (one sNode per shape, one sTransform per data point)
   - different shapes as aes() options or style options
+- geom_col:
+  - fix spacing and scale
