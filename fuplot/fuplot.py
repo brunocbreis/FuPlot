@@ -1,5 +1,5 @@
 from typing import Protocol
-import pandas as pd
+from pandas import DataFrame
 from .style import COLORS
 from .geom_line import GeomLine
 from .geom_point import GeomPoint
@@ -31,18 +31,34 @@ def aes(x: str | None = None, y: str | None = None, **kwargs) -> dict[str, str |
     return dict(x=x, y=y, **kwargs)
 
 
+class InvalidMapping(KeyError):
+    pass
+
+
+def check_mappings(map: dict[str, str], data: DataFrame):
+    for k, v in map.items():
+        if v in data:
+            continue
+        raise InvalidMapping(
+            f'Tried to map "{k}" aesthetic to inexistent column "{v}".'
+        )
+
+
 # FUPLOT ==================================================
 @dataclass
 class FuPlot:
     """FuPlot initializer class. This is the base upon which you can add your geoms to map your data into geometry."""
 
-    data: pd.DataFrame
+    data: DataFrame
     mapping: dict[str, str] = None
     width: float = 0.75
     height: float = 0.75
     resolution: tuple[int, int] = (1920, 1080)
 
     def __post_init__(self) -> None:
+        # check if mappings are valid:
+        check_mappings(self.mapping, self.data)
+
         self.geoms: list[Geom] = []
 
         self._set_defaults()
@@ -170,8 +186,8 @@ class FuPlot:
         return s
 
     def pass_to_geom(
-        self, data: pd.DataFrame, mapping: dict[str, str]
-    ) -> tuple[pd.DataFrame, dict[str, str]]:
+        self, data: DataFrame, mapping: dict[str, str]
+    ) -> tuple[DataFrame, dict[str, str]]:
         """Generalizes the passing of data and mapping to any geom."""
 
         self._auto_scale_mappings(mapping)
@@ -200,7 +216,7 @@ class FuPlot:
 
     def geom_line(
         self,
-        data: pd.DataFrame = None,
+        data: DataFrame = None,
         mapping: dict[str, str] = None,
         thickness: float = None,
         color: RGBA = None,
@@ -214,7 +230,7 @@ class FuPlot:
 
     def geom_point(
         self,
-        data: pd.DataFrame | None = None,
+        data: DataFrame | None = None,
         mapping: dict[str, str] | None = None,
         fill: RGBA | None = None,
         opacity: float | None = None,
@@ -242,7 +258,7 @@ class FuPlot:
 
     def geom_col(
         self,
-        data: pd.DataFrame | None = None,
+        data: DataFrame | None = None,
         mapping: dict[str, str] | None = None,
         fill: RGBA | None = None,
         spacing: float | None = None,
