@@ -21,3 +21,6 @@ FuPlot is a ggplot2 (heavily) inspired framework for creating animatable data vi
   - or add modifiers to each input... don't know which is heavier on the cpu
 - themes
 - color palettes / scales
+- geom_point:
+  - use sNodes instead of masks (one sNode per shape, one sTransform per data point)
+  - different shapes as aes() options or style options
