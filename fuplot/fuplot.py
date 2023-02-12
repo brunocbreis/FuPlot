@@ -3,6 +3,7 @@ import pandas as pd
 from .style import COLORS
 from .geom_line import GeomLine
 from .geom_point import GeomPoint
+from .geom_col import GeomCol
 from pysion import Tool, wrap_for_fusion, Macro
 from pysion.utils import fusion_point, RGBA
 from dataclasses import dataclass
@@ -233,6 +234,29 @@ class FuPlot:
                 size=size,
                 max_size=max_size,
                 min_size=min_size,
+                index=index,
+            )
+        )
+
+        return self
+
+    def geom_col(
+        self,
+        data: pd.DataFrame | None = None,
+        mapping: dict[str, str] | None = None,
+        fill: RGBA | None = None,
+        spacing: float | None = None,
+    ):
+        data, mapping = self.pass_to_geom(data, mapping)
+
+        index = len(self.geoms) + 1
+
+        self.geoms.append(
+            GeomCol(
+                data=data,
+                mapping=mapping,
+                fill=fill,
+                spacing=spacing,
                 index=index,
             )
         )

@@ -59,11 +59,23 @@ def _fusionize_date(
     ...
 
 
-def _fusionize_categorical(
+def fusionize_categorical_to_position(
+    n_values: int,
+    scale_plot: tuple[float, float] = (0, 1),
+) -> list[float]:
+    """Maps categorical variable data points to Fusion continuous input values (such as position)."""
+    min_pos = min(scale_plot)
+    range_pos = max(scale_plot) - min_pos
+    step = range_pos / (n_values)
+
+    return [min_pos + (i - 1) * step for i in range(n_values)]
+
+
+def _fusionize_categorical_to_categorical(
     values: list[int | float | str] | Series,
     ascending: bool = True,
 ) -> list[float]:
-    """Maps categorical variable data points to Fusion input values."""
+    """Maps categorical variable data points to Fusion discrete input values (such as a list of colors)."""
     ...
 
 
