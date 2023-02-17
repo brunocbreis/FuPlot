@@ -184,9 +184,13 @@ class FuPlot:
             if i == 0:
                 continue
             if i == 1:
-                merges.append(Tool.merge(f"Merge{i}", tools[i - 1], tool, (i - 1, 0)))
+                merges.append(
+                    self.comp.add_merge(f"Merge{i}", tools[i - 1], tool, (i - 1, 0))
+                )
                 continue
-            merges.append(Tool.merge(f"Merge{i}", merges[i - 2], tool, (i - 1, 0)))
+            merges.append(
+                self.comp.add_merge(f"Merge{i}", merges[i - 2], tool, (i - 1, 0))
+            )
 
         self.comp.add_tools(*(tools + merges))
 
