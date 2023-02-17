@@ -1,6 +1,5 @@
 from .fusionize import fusionize, dim_to_scale, fusionize_categorical_to_position
-from pysion.utils import RGBA
-from pysion import Tool, Macro, Output, Input
+from pysion import Tool, Macro, RGBA
 from pandas import DataFrame
 
 
@@ -61,8 +60,9 @@ class GeomCol:
 
         tools += transforms
 
-        geom_col = Macro(f"GeomCol{self.index}", tools, (self.index, -1))
-        geom_col.id = "GroupOperator"
+        geom_col = Macro(
+            f"GeomCol{self.index}", type="group", position=(self.index, -1)
+        ).add_tools(*tools)
 
         return geom_col
 
@@ -122,7 +122,7 @@ class GeomCol:
                     YPivot=self.y_pivot,
                     XPivot=self.x_offset,
                 )
-                .add_source_input("Input", base_col.name)
+                .add_source_input("Input", base_col.name, base_col.output)
             )
         mrg = self._render_smerge(transforms)
         srender = self._render_srender(mrg)
@@ -132,11 +132,11 @@ class GeomCol:
     def _render_smerge(self, transforms: list[Tool]) -> Tool:
         merge = Tool("sMerge", f"GeomColMerge{self.index}", (2, 0))
         for i, t in enumerate(transforms, start=1):
-            merge.add_source_input(f"Input{i}", t.name)
+            merge.add_source_input(f"Input{i}", t.name, t.output)
 
         return merge
 
     def _render_srender(self, merge: Tool) -> Tool:
         return Tool("sRender", f"GeomColRender{self.index}", (3, 0)).add_source_input(
-            "Input", merge.name
+            "Input", merge.name, merge.output
         )

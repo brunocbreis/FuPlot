@@ -1,2 +1,2 @@
 from .fuplot import FuPlot, aes
-from pysion.utils import RGBA
+from pysion.color import RGBA

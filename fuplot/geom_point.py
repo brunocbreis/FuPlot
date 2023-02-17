@@ -1,6 +1,5 @@
 from .fusionize import fusionize, dim_to_scale
-from pysion import Tool, Macro
-from pysion.utils import fusion_point, RGBA, fu_id
+from pysion import Tool, Macro, FuID, RGBA
 from pandas import DataFrame
 
 
@@ -79,14 +78,16 @@ class GeomPoint:
         for p, s in zip(points, fu_size):
             self._add_point(p[0], p[1], s)
 
-        bg = Tool.bg(
+        bg = Tool.background(
             "GeomPointFill",
             RGBA(self.fill.red, self.fill.green, self.fill.blue),
-            resolution,
-            (0, len(self.points)),
-        ).add_mask(self.points[-1].name)
+            resolution=resolution,
+            position=(0, len(self.points)),
+        ).add_mask(self.points[-1])
 
-        macro = Macro(self.name, self.points + [bg], (self.index, -1))
+        macro = Macro(self.name, type="group", position=(self.index, -1)).add_tools(
+            *(self.points + [bg])
+        )
 
         return macro
 
@@ -98,9 +99,9 @@ class GeomPoint:
 
         i = len(self.points)
         ellipse = Tool.mask(f"Point{i+1}", "Ellipse", (0, i)).add_inputs(
-            Width=size, Height=size, Center=fusion_point(x, y), Level=self.opacity
+            Width=size, Height=size, Center=(x, y), Level=self.opacity
         )
         if len(self.points) > 0:
-            ellipse.add_mask(self.points[i - 1].name).add_inputs(PaintMode=fu_id("Add"))
+            ellipse.add_mask(self.points[i - 1]).add_inputs(PaintMode=FuID("Add"))
 
         self._points.append(ellipse)

@@ -1,4 +1,4 @@
-from pysion.utils import RGBA
+from pysion import RGBA
 from types import SimpleNamespace
 
 

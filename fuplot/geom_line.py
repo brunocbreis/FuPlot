@@ -1,6 +1,5 @@
 from .fusionize import fusionize, dim_to_scale
-from pysion.utils import RGBA
-from pysion import Tool, Macro, Input
+from pysion import Tool, Macro, RGBA
 from pandas import DataFrame
 
 
@@ -52,20 +51,21 @@ class GeomLine:
         line = (
             Tool.mask(f"PlotLine{self.index}", "Polyline", (0, -1))
             .add_inputs(BorderWidth=self.thickness)
-            .add_inputs("Expression", Level="WriteLength > 0 and 1 or 0")
+            .add_expression_input("Level", "WriteLength > 0 and 1 or 0")
             .add_published_polyline(points)
         )
 
-        background = Tool.bg(f"PlotColor{self.index}", self.color, resolution).add_mask(
-            line.name
-        )
+        background = Tool.background(
+            f"PlotColor{self.index}", self.color, resolution=resolution
+        ).add_mask(line)
 
         geom_line = (
-            Macro(self.name, [line, background], (self.index, -1))
+            Macro(self.name, type="group", position=(self.index, -1))
+            .add_tools(line, background)
             .add_color_input(background)
-            .add_instance_input(line.inputs["BorderWidth"], Name="Thickness")
-            .add_instance_input(Input(line.name, "WritePosition", 0))
-            .add_instance_input(Input(line.name, "WriteLength", 1))
+            .add_input(line, "BorderWidth", pretty_name="Thickness")
+            .add_input(line, "WritePosition", "Position")
+            .add_input(line, "WriteLength", "Length")
         )
 
         return geom_line

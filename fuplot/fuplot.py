@@ -4,8 +4,7 @@ from .style import COLORS
 from .geom_line import GeomLine
 from .geom_point import GeomPoint
 from .geom_col import GeomCol
-from pysion import Tool, wrap_for_fusion, Macro
-from pysion.utils import fusion_point, RGBA
+from pysion import Tool, Macro, RGBA, Composition
 from dataclasses import dataclass
 import pyperclip
 
@@ -36,7 +35,11 @@ class InvalidMapping(KeyError):
 
 
 def check_mappings(map: dict[str, str], data: DataFrame):
+    if map is None:
+        return None
     for k, v in map.items():
+        if v is None:
+            continue
         if v in data:
             continue
         raise InvalidMapping(
@@ -66,6 +69,8 @@ class FuPlot:
         self.mapping_scales: dict[str, tuple[float, float]] = None
         self._auto_scale_mappings(self.mapping)
 
+        self.comp = Composition()
+
     def _set_defaults(self):
         self.background_color = COLORS.white
         self.padding = 0.05
@@ -73,9 +78,14 @@ class FuPlot:
         self.axis_color = RGBA(0.6, 0.6, 0.6, 1)
 
     def _render_background(self) -> Tool:
-        return Tool.bg("PlotBG", self.background_color, self.resolution, (-1, 0))
+        return Tool.background(
+            "PlotBG",
+            self.background_color,
+            resolution=self.resolution,
+            position=(-1, 0),
+        )
 
-    def _render_axes(self) -> Tool:
+    def _render_axes(self) -> Macro:
         ar = self.aspect_ratio
         pd = self.padding
 
@@ -88,23 +98,23 @@ class FuPlot:
         x_axis = Tool.mask("XAxis").add_inputs(
             Height=self.axis_thickness * ar,
             Width=width,
-            Center=fusion_point(0.5, y_pos),
+            Center=(0.5, y_pos),
         )
         y_axis = (
             Tool.mask("YAxis")
             .add_inputs(
                 Height=height,
                 Width=self.axis_thickness,
-                Center=fusion_point(x_pos, 0.5),
+                Center=(x_pos, 0.5),
             )
-            .add_mask(x_axis.name)
+            .add_mask(x_axis)
         )
 
-        fill = Tool.bg("AxisFill", self.axis_color, self.resolution).add_mask(
-            y_axis.name
-        )
+        fill = Tool.background(
+            "AxisFill", self.axis_color, resolution=self.resolution
+        ).add_mask(y_axis)
 
-        return Macro("Axes", [x_axis, y_axis, fill], (0, -1))
+        return Macro("Axes", position=(0, -1)).add_tools(x_axis, y_axis, fill)
 
     def _render_geoms(self) -> list[Tool]:
         g: list[Tool] = []
@@ -160,30 +170,32 @@ class FuPlot:
         return self.resolution[0] / self.resolution[1]
 
     def render(self) -> str:
-        t: list[Tool] = []
+        tools: list[Tool | Macro] = []
         merges: list[Tool] = []
         geoms = self._render_geoms()
 
         bg = self._render_background()
         axes = self._render_axes()
 
-        t += [bg, axes]
-        t += geoms
+        tools += [bg, axes]
+        tools += geoms
 
-        for i, tool in enumerate(t):
+        for i, tool in enumerate(tools):
             if i == 0:
                 continue
             if i == 1:
-                merges.append(Tool.merge(f"Merge{i}", t[i - 1], tool, (i - 1, 0)))
+                merges.append(Tool.merge(f"Merge{i}", tools[i - 1], tool, (i - 1, 0)))
                 continue
             merges.append(Tool.merge(f"Merge{i}", merges[i - 2], tool, (i - 1, 0)))
 
-        s = wrap_for_fusion(t + merges)
-        pyperclip.copy(s)
+        self.comp.add_tools(*(tools + merges))
+
+        rendered_node_tree = repr(self.comp)
+        pyperclip.copy(rendered_node_tree)
 
         print("Rendered node tree successfully copied to the clipboard.")
 
-        return s
+        return rendered_node_tree
 
     def pass_to_geom(
         self, data: DataFrame, mapping: dict[str, str]
