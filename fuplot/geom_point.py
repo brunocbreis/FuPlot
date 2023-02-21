@@ -1,5 +1,6 @@
 from .fusionize import fusionize, dim_to_scale
-from pysion import Tool, Macro, FuID, RGBA
+from pysion import Tool, Macro, RGBA
+from pysion.values import FuID
 from pandas import DataFrame
 
 
@@ -102,6 +103,6 @@ class GeomPoint:
             Width=size, Height=size, Center=(x, y), Level=self.opacity
         )
         if len(self.points) > 0:
-            ellipse.add_mask(self.points[i - 1]).add_inputs(PaintMode=FuID("Add"))
+            ellipse.add_mask(self.points[i - 1]).add_inputs(PaintMode=FuID.add())
 
         self._points.append(ellipse)
