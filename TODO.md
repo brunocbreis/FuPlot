@@ -2,7 +2,7 @@
 
 ## Features and Fixes
 
-## General improvements
+### General improvements
 
 - [X] wrap stuff into a group for cleaner node output
 - [ ] customizable scale
