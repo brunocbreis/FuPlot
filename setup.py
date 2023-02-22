@@ -1,17 +1,4 @@
-import setuptools
+from setuptools import setup
 
-setuptools.setup(
-    name="fuplot",
-    version="0.1",
-    description="Framework for creating animatable data visualizations from tabular data for DaVinci Resolve Fusion.",
-    url="https://github.com/brunocbreis/FuPlot",
-    author="Bruno Reis",
-    install_requires=[
-        "pysion @ git+https://github.com/brunocbreis/pysion",
-        "pandas",
-        "pyperclip",
-    ],
-    author_email="brunocbreis@gmail.com",
-    packages=setuptools.find_packages(),
-    zip_safe=False,
-)
+if __name__ == "__main__":
+    setup()

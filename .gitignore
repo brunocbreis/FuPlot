@@ -9,3 +9,4 @@ dist/
 bin/
 .venv/
 use_test.py
+*.psd
