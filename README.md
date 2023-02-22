@@ -51,6 +51,9 @@ The code above produces the following result in Fusion:
 
 !["A line plot for IVV prices"](https://github.com/brunocbreis/FuPlot/blob/main/images/geom_line_screenshot.png)
 
+In the backstage, it's using [pysion](https://github.com/brunocbreis/pysion), another Python package I created
+to help generate Fusion compatible code.
+
 ## How to install
 
 You can install FuPlot by running `pip install git+https://github.com/brunocbreis/FuPlot/` in your Terminal.
