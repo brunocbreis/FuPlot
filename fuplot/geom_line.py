@@ -52,7 +52,15 @@ class GeomLine:
             Tool.mask(f"PlotLine{self.index}", "Polyline", (0, -1))
             .add_inputs(BorderWidth=self.thickness)
             .add_expression_input("Level", "WriteLength > 0 and 1 or 0")
-            .add_published_polyline(points)
+            .add_published_polyline_with_expression(
+                points, "(POINT - .5) * XScale + .5", "(POINT - .5) * YScale + .5"
+            )
+            .add_user_control(
+                "X Scale", page="Controls", default=1, min_scale=0, max_scale=2
+            )
+            .add_user_control(
+                "Y Scale", page="Controls", default=1, min_scale=0, max_scale=2
+            )
         )
 
         background = Tool.background(
@@ -66,6 +74,8 @@ class GeomLine:
             .add_input(line, "BorderWidth", pretty_name="Thickness")
             .add_input(line, "WritePosition", "Position")
             .add_input(line, "WriteLength", "Length")
+            .add_input(line, "XScale", "X Scale")
+            .add_input(line, "YScale", "Y Scale")
         )
 
         return geom_line
