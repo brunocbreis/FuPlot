@@ -1,12 +1,16 @@
 from typing import Protocol
 from pandas import DataFrame
+
 from .style import COLORS
 from .geom_line import GeomLine
 from .geom_point import GeomPoint
 from .geom_col import GeomCol
 from pysion import Tool, Macro, RGBA, Composition
+from pysion.values import ToolID
 from dataclasses import dataclass
 import pyperclip
+
+from .canvas import Canvas
 
 
 # GEOMS ========================================
@@ -71,6 +75,8 @@ class FuPlot:
 
         self.comp = Composition()
 
+        self.canvas = Canvas(self.resolution, self.width, self.height)
+
     def _set_defaults(self):
         self.background_color = COLORS.white
         self.padding = 0.05
@@ -84,6 +90,9 @@ class FuPlot:
             resolution=self.resolution,
             position=(-1, 0),
         )
+
+    def _render_canvas(self) -> Macro:
+        return self.canvas.render()
 
     def _render_axes(self) -> Macro:
         ar = self.aspect_ratio
@@ -114,18 +123,59 @@ class FuPlot:
             "AxisFill", self.axis_color, resolution=self.resolution
         ).add_mask(y_axis)
 
-        return Macro("Axes", position=(0, -1)).add_tools(x_axis, y_axis, fill)
+        axes = Macro("Axes", type="macro", position=(0, -1)).add_tools(
+            x_axis, y_axis, fill
+        )
+
+        ticks = self._render_ticks()
+        if ticks:
+            mrg = Tool.merge("MergeXTix", fill, ticks[2], (0, 1)).add_inputs(
+                Center=(0.5, y_pos)
+            )
+            axes.add_tools(*ticks, mrg)
+
+        return axes
 
     def _render_geoms(self) -> list[Tool]:
-        g: list[Tool] = []
+        rendered_geoms: list[Tool] = []
         for geom in self.geoms:
-            g.append(
+            rendered_geoms.append(
                 geom.render(
                     self.width, self.height, self.mapping_scales, self.resolution
                 )
             )
 
-        return g
+        return rendered_geoms
+
+    def _render_ticks(self, x_ticks_amt: int = 5, y_ticks_amt: int = 5) -> list[Tool]:
+        if x_ticks_amt > 0:
+            v_tick = (
+                Tool(ToolID.s_rectangle, "VTick")
+                .add_inputs(Width=self.axis_thickness, Height=0.015)
+                .add_inputs(
+                    **{
+                        '["Translate.X"]': -self.width / 2,
+                        # '["Translate.Y"]': -self.height / 2 * 1 / self.aspect_ratio,
+                    }
+                )
+                .add_color_input(self.axis_color)
+            )
+            x_duplicate = (
+                Tool(ToolID.s_duplicate, "XDup", (0, 1))
+                .add_inputs(
+                    Copies=x_ticks_amt - 1, XOffset=self.width / (x_ticks_amt - 1)
+                )
+                .add_source_input("Input", v_tick.name, "Output")
+            )
+            x_render = (
+                Tool(ToolID.s_render, "XRender")
+                .add_source_input("Input", x_duplicate.name, "Output")
+                .add_inputs(Width=self.resolution[0], Height=self.resolution[1])
+            )
+
+            return v_tick, x_duplicate, x_render
+
+        return None
 
     def _auto_scale_mappings(self, mapping: dict[str, str]) -> None:
         """Calculates max an min values for each variable that has been
@@ -175,9 +225,9 @@ class FuPlot:
         geoms = self._render_geoms()
 
         bg = self._render_background()
-        axes = self._render_axes()
+        canvas = self._render_canvas()
 
-        tools += [bg, axes]
+        tools += [bg, canvas]
         tools += geoms
 
         for i, tool in enumerate(tools):
@@ -207,7 +257,6 @@ class FuPlot:
         """Generalizes the passing of data and mapping to any geom."""
 
         self._auto_scale_mappings(mapping)
-        # print(self.mapping_scales)
 
         if data is None:
             data = self.data
