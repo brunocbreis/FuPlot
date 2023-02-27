@@ -10,3 +10,4 @@ bin/
 .venv/
 use_test.py
 *.psd
+reference/
